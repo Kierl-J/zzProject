@@ -87,6 +87,17 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+app.get('/users', authenticateToken, async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT id, username, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') FROM users");
+    
+    res.json(rows); // Send the result back to the client
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Database error' });
+  }
+});
+
 app.post("/refresh", (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) return res.status(401).json({ message: "No refresh token provided" });
